@@ -34,11 +34,11 @@ mongoose.connect(process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017/chat-app'
     useUnifiedTopology: true,
 })
 .then(() => {
-    console.log('✅ MongoDB connected successfully');
-    console.log(`📊 Database: ${mongoose.connection.name}`);
+    console.log(' MongoDB connected successfully');
+    console.log(` Database: ${mongoose.connection.name}`);
 })
 .catch((err) => {
-    console.log('❌ MongoDB connection error:', err);
+    console.log(' MongoDB connection error:', err);
     process.exit(1);
 });
 
@@ -92,17 +92,17 @@ app.get('/', (req, res) => {
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
-    console.log('🔌 New client connected:', socket.id);
+    console.log('New client connected:', socket.id);
     
-    // Initialize chat handler
+
     chatHandler(io, socket);
     
     socket.on('disconnect', () => {
-        console.log('❌ Client disconnected:', socket.id);
+        console.log(' Client disconnected:', socket.id);
     });
 });
 
-// Temporary route to generate test token
+
 app.get('/api/test-token', (req, res) => {
     const jwt = require('jsonwebtoken');
     const token = jwt.sign({ userId: 'test-user-id' }, 'your-secret-key', { expiresIn: '7d' });
@@ -115,34 +115,34 @@ app.get('/api/test-token', (req, res) => {
   
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error('🚨 Error:', err.stack);
+    console.error(' Error:', err.stack);
     res.status(500).json({ 
         error: 'Something went wrong!',
         message: err.message 
     });
 });
 
-// 404 handler
+
 app.use('*', (req, res) => {
     res.status(404).json({ error: 'Route not found' });
 });
 
-const PORT = process.env.PORT || 5805; // Changed to 5804
+const PORT = process.env.PORT || 5805; 
 
 server.listen(PORT, () => {
     console.log('='.repeat(50));
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
-    console.log(`🌐 Frontend: http://localhost:${PORT}/`);
+    console.log(` Server running on port ${PORT}`);
+    console.log(` Health check: http://localhost:${PORT}/api/health`);
+    console.log(` Frontend: http://localhost:${PORT}/`);
     console.log('='.repeat(50));
 });
 
 // Graceful shutdown
 process.on('SIGINT', () => {
-    console.log('\n🛑 Shutting down server...');
+    console.log('\n Shutting down server...');
     mongoose.connection.close();
     server.close(() => {
-        console.log('✅ Server closed');
+        console.log('Server closed');
         process.exit(0);
     });
 });
