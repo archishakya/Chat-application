@@ -7,9 +7,7 @@ const setupSocketHandlers = (io) => {
       try {
         const { message, receiverId, roomId, senderId } = data;
         
-        // Save message to database logic here
-        // const newMessage = new Message({ ... });
-        // await newMessage.save();
+      
 
         // Emit to specific user or room
         if (receiverId) {
