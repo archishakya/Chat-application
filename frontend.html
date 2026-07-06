@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        input, textarea, button {
+            display: block;
+            margin: 5px 0;
+            padding: 8px;
+            width: 100%;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .user-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+        #usersList {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat Application</h1>
+    
+    <div class="section">
+        <h3>Connection</h3>
+        <input type="text" id="jwtToken" placeholder="Enter any text for JWT token">
+        <button onclick="connectToChat()">Connect to Chat</button>
+        <p>Status: <span id="status">Not connected</span></p>
+    </div>
+
+    <div class="section">
+        <h3>Online Users</h3>
+        <button onclick="loadUsers()">Load Users</button>
+        <div id="usersList">
+            <p>No users loaded yet</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Chat</h3>
+        <input type="text" id="receiverId" placeholder="Receiver User ID">
+        <textarea id="messageInput" placeholder="Type your message"></textarea>
+        <button onclick="sendMessage()">Send Message</button>
+        <div id="messages" style="margin-top: 10px;"></div>
+    </div>
+
+    <script>
+        // Simple function to load users
+        async function loadUsers() {
+            console.log('Loading users...');
+            
+            try {
+                // Use the debug endpoint we know works
+                const response = await fetch('http://localhost:5803/api/debug/users');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users');
+                }
+                
+                const data = await response.json();
+                console.log('Users data:', data);
+                
+                displayUsers(data.users);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error loading users: ' + error.message);
+            }
+        }
+
+        // Display users
+        function displayUsers(users) {
+            const usersList = document.getElementById('usersList');
+            
+            if (!users || users.length === 0) {
+                usersList.innerHTML = '<p>No users found</p>';
+                return;
+            }
+            
+            let html = '';
+            users.forEach(user => {
+                html += `
+                    <div class="user-item">
+                        <strong>${user.username}</strong> (${user.email})
+                        <br>
+                        <small>Status: ${user.isOnline ? 'Online' : 'Offline'}</small>
+                        <button onclick="selectUser('${user._id}')" style="width: auto; margin-top: 5px;">
+                            Select for Chat
+                        </button>
+                    </div>
+                `;
+            });
+            
+            usersList.innerHTML = html;
+        }
+
+        // Select user
+        function selectUser(userId) {
+            document.getElementById('receiverId').value = userId;
+            alert('User selected: ' + userId);
+        }
+
+        // Connect to chat (simplified)
+        function connectToChat() {
+            const token = document.getElementById('jwtToken').value;
+            if (!token) {
+                alert('Please enter a token');
+                return;
+            }
+            
+            document.getElementById('status').textContent = 'Connected';
+            document.getElementById('status').style.color = 'green';
+            
+            // Load users automatically when connected
+            loadUsers();
+        }
+
+        // Send message
+        function sendMessage() {
+            const receiverId = document.getElementById('receiverId').value;
+            const message = document.getElementById('messageInput').value;
+            
+            if (!receiverId || !message) {
+                alert('Please enter receiver ID and message');
+                return;
+            }
+            
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `
+                <div style="background: #e9ecef; padding: 5px; margin: 5px 0;">
+                    <strong>You to ${receiverId}:</strong> ${message}
+                </div>
+            `;
+            
+            document.getElementById('messageInput').value = '';
+        }
+
+        // Load users when page opens
+        window.onload = function() {
+            console.log('Page loaded');
+        };
+    </script>
+  <script>
+    // Simple function to load users
+    async function loadUsers() {
+        console.log('🔄 Loading users...');
+        
+        try {
+            // Call the API endpoint that we know works
+            const response = await fetch('http://localhost:5805/api/debug/users');
+            
+            if (!response.ok) {
+                throw new Error('Failed to load users');
+            }
+            
+            const data = await response.json();
+            console.log('✅ Users data:', data);
+            
+            // Display the users
+            displayUsers(data.users);
+            
+        } catch (error) {
+            console.error('❌ Error:', error);
+            alert('Error: ' + error.message);
+        }
+    }
+
+    // Function to display users
+    function displayUsers(users) {
+        const usersList = document.getElementById('usersList');
+        
+        if (!users || users.length === 0) {
+            usersList.innerHTML = '<p>No users found</p>';
+            return;
+        }
+        
+        let html = `<h4>Found ${users.length} Users:</h4>`;
+        
+        users.forEach(user => {
+            html += `
+                <div style="background: #f8f9fa; padding: 10px; margin: 8px 0; border-radius: 5px; border-left: 4px solid #007bff;">
+                    <strong>👤 ${user.username}</strong>
+                    <br>📧 ${user.email}
+                    <br>🆔 ${user._id}
+                    <br>📱 ${user.isOnline ? '🟢 Online' : '🔴 Offline'}
+                    <br>
+                    <button onclick="selectUser('${user._id}')" 
+                            style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; margin-top: 5px; cursor: pointer;">
+                        💬 Select for Chat
+                    </button>
+                </div>
+            `;
+        });
+        
+        usersList.innerHTML = html;
+    }
+
+    // Select user for chat
+    function selectUser(userId) {
+        document.getElementById('receiverId').value = userId;
+        alert('User selected! User ID: ' + userId + '\n\nNow you can send messages to this user.');
+    }
+
+    // Connect to chat
+    function connectToChat() {
+        const token = document.getElementById('jwtToken').value;
+        if (!token) {
+            alert('Please enter any text in JWT token field');
+            return;
+        }
+        
+        document.getElementById('status').textContent = 'Connected ✅';
+        document.getElementById('status').style.color = 'green';
+        
+        // Auto-load users
+        loadUsers();
+    }
+
+    // Send message
+    function sendMessage() {
+        const receiverId = document.getElementById('receiverId').value;
+        const message = document.getElementById('messageInput').value;
+        
+        if (!receiverId) {
+            alert('Please select a user first by clicking "Select for Chat"');
+            return;
+        }
+        
+        if (!message) {
+            alert('Please enter a message');
+            return;
+        }
+        
+        // For demo, just show the message
+        const messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML += `
+            <div style="background: #e7f3ff; padding: 8px; margin: 5px 0; border-radius: 4px;">
+                <strong>You → ${receiverId}:</strong> ${message}
+                <br><small>${new Date().toLocaleTimeString()}</small>
+            </div>
+        `;
+        
+        document.getElementById('messageInput').value = '';
+    }
+</script>  
+</body>
+</html>
