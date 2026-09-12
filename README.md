@@ -118,6 +118,16 @@ The backend will run locally on:
 http://localhost:5801
 ```
 
+## Live Demo
+
+A live version is deployed on AWS EC2:
+
+```
+http://3.107.9.117/
+```
+
+> Note: this is an HTTP-only demo link (no SSL configured), so your browser may show a "Not Secure" warning — this is expected and safe to ignore for demo purposes.
+
 ## API
 
 The application provides REST APIs for:
